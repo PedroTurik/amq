@@ -9,7 +9,8 @@ Rounds pick random openings filtered by **difficulty** (mainly how popular the a
   Full evidence and reasoning are in `DATA_FINDINGS.md`. Read it before changing the data approach.
 - **Phase 2 is done: the app** (a working MVP; the UI is intentionally plain). See `README.md` for how to run, deploy,
   the game rules and a code map. `npm test` runs the unit tests and the socket end-to-end tests.
-- **Next: visual design** of the frontend (`web/src/`, `styles.css`). Game logic lives only on the server.
+- **Next: visual design** of the frontend. **Designer agents: start with `DESIGN_HANDOFF.md`** (screens, states,
+  constraints, how to reach every screen). Game logic lives only on the server. The user tested the app with real players and confirmed it works.
 
 ## Decisions made with the user
 - Stack: Node + TypeScript, Express + Socket.IO, SQLite (better-sqlite3), React + Vite. Hosted on a VPS
@@ -37,6 +38,7 @@ Rounds pick random openings filtered by **difficulty** (mainly how popular the a
 | `anime_ids.json` | User-provided id map, keyed by **AniDB id** → `{mal_id, anilist_id, tvdb_id, ...}` (17k entries, 1.7 MB; query it programmatically). The builder uses it as a join fallback. |
 | `DATA_FINDINGS.md` | Research report: sources compared, coverage numbers, rejected options. |
 | `README.md` | App: run/deploy instructions, game rules, code map. |
+| `DESIGN_HANDOFF.md` | Brief for the UX/UI designer: every screen/state, data available, technical constraints, checklist. |
 
 ## `openings.json` schema (array of objects, one per opening)
 | Field | Type | Notes |

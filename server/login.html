@@ -3,22 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anime Quiz</title>
+<meta name="theme-color" content="#09090f">
+<meta name="color-scheme" content="dark">
+<title>Petit Quiz</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23e3206f'/%3E%3Cg fill='%23fff'%3E%3Crect x='7' y='14' width='3.2' height='11' rx='1.6'/%3E%3Crect x='12.6' y='7' width='3.2' height='18' rx='1.6'/%3E%3Crect x='18.2' y='11' width='3.2' height='14' rx='1.6'/%3E%3Crect x='23.8' y='16' width='3.2' height='9' rx='1.6'/%3E%3C/g%3E%3C/svg%3E">
+<!-- The app's bundled assets need auth, so this page takes the same font from Google Fonts. Keep it in sync with Login in web/src/App.tsx. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&display=swap">
 <style>
-  body { font-family: system-ui, sans-serif; background: #111; color: #eee; display: grid; place-items: center; min-height: 100vh; margin: 0; }
-  form { display: grid; gap: 10px; width: min(320px, 90vw); }
-  input, button { font: inherit; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: inherit; }
-  button { background: #3b6fd8; border: 0; cursor: pointer; }
-  #err { color: #f77; min-height: 1.2em; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
+    background: #09090f; color: #f3f1fa; font: 16px/1.45 Outfit, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(60vw 50vh at 0% -10%, #e3206f1f, transparent 70%), radial-gradient(50vw 50vh at 100% 110%, #38e1f514, transparent 70%);
+  }
+  .box { width: min(400px, 100%); display: grid; gap: 28px; justify-items: center; }
+  .logo { display: inline-flex; align-items: center; gap: 14px; font-weight: 800; font-size: 40px; letter-spacing: -.02em; }
+  .logo b { color: #ff5ea0; }
+  .tagline { color: #a09eb8; margin: -16px 0 0; }
+  form { width: 100%; display: grid; gap: 14px; background: #13131d; border: 1px solid #262638; border-radius: 16px; padding: 20px; }
+  label { display: grid; gap: 6px; font-size: 14px; color: #a09eb8; font-weight: 500; }
+  input {
+    font: inherit; font-size: 16px; color: inherit; padding: 11px 14px; border-radius: 10px;
+    background: #1a1a27; border: 1px solid #34344b; transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus { outline: none; border-color: #38e1f5; box-shadow: 0 0 0 3px #38e1f51f; }
+  button {
+    font: inherit; font-size: 18px; font-weight: 600; color: #fff; background: #e3206f; border: 0; cursor: pointer;
+    min-height: 54px; border-radius: 14px; box-shadow: 0 6px 20px -8px #e3206f; transition: background .15s;
+  }
+  button:hover { background: #f5388a; }
+  button:focus-visible { outline: 2px solid #38e1f5; outline-offset: 2px; }
+  #err { color: #ff5b6e; font-size: 14px; }
+  #err:empty { display: none; }
 </style>
 </head>
 <body>
-<form id="f">
-  <h2>Anime Quiz</h2>
-  <input id="pw" type="password" placeholder="Site password" autocomplete="current-password" autofocus required>
-  <button>Enter</button>
-  <div id="err"></div>
-</form>
+<div class="box">
+  <span class="logo">
+    <svg width="52" height="52" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5ea0"/><stop offset="1" stop-color="#c4165f"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#g)"/><g fill="#fff"><rect x="7" y="14" width="3.2" height="11" rx="1.6"/><rect x="12.6" y="7" width="3.2" height="18" rx="1.6"/><rect x="18.2" y="11" width="3.2" height="14" rx="1.6"/><rect x="23.8" y="16" width="3.2" height="9" rx="1.6" fill-opacity=".75"/></g></svg>
+    <span>Petit <b>Quiz</b></span>
+  </span>
+  <p class="tagline">Guess the anime from its opening.</p>
+  <form id="f">
+    <label>Site password
+      <input id="pw" type="password" autocomplete="current-password" autofocus required>
+    </label>
+    <button>Enter</button>
+    <div id="err" role="alert"></div>
+  </form>
+</div>
 <script>
   document.getElementById('f').addEventListener('submit', async (e) => {
     e.preventDefault();

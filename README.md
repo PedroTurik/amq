@@ -80,7 +80,7 @@ Media is streamed by each browser directly from AMQ's CDN, not through the serve
 | `server/dataset.ts` / `picker.ts` | Loads the dataset, difficulty tiers, song selection (tier → franchise → song, no repeats) |
 | `server/db.ts` | SQLite schema and queries |
 | `web/src/media.ts` | Playback engine: syncs audio to the server clock, preloads, mirror fallback, autoplay unlock |
-| `web/src/*.tsx` | React UI (deliberately plain for now) |
+| `web/src/*.tsx`, `ui.tsx`, `styles.css` | React UI ("Petit Quiz" design; see `DESIGN_HANDOFF.md`) |
 
 The server is authoritative and sends each player a full, personalized snapshot of the room on every change (small,
 coalesced per tick). Clients hold no game logic, which is why a reconnect is just "send me the snapshot". Answers

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { TitleIndex } from '../../shared/search';
 import type { TitleEntry } from '../../shared/types';
+import { Icon } from './ui';
 
 interface Props {
   index: TitleIndex | null;
@@ -50,32 +51,45 @@ export function GuessInput({ index, enabled, current, onPick, onLock, roundKey }
     <div className="guess">
       <div className="guess-row">
         <div className="ac">
+          <Icon name={locked ? 'lock' : 'search'} size={20} />
           <input
             ref={input}
             value={text}
             disabled={!enabled || locked}
             placeholder={!index ? 'Loading titles…' : locked ? 'Answer locked' : 'Type the anime name…'}
+            aria-label="Your answer"
+            role="combobox"
+            aria-expanded={showList}
+            aria-autocomplete="list"
             onChange={(e) => { setText(e.target.value); setOpen(true); setHi(0); }}
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
             onKeyDown={onKey}
             autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
             spellCheck={false}
+            enterKeyHint="done"
           />
           {showList && (
-            <ul className="ac-list">
+            <ul className="ac-list" role="listbox">
               {results.map((r, i) => (
-                <li key={r.id} className={i === hi ? 'hi' : ''} onMouseDown={(e) => { e.preventDefault(); pick(r); }} onMouseEnter={() => setHi(i)}>
-                  {r.t} <span className="muted small">{[r.f.replace('_', ' '), r.y].filter(Boolean).join(' · ')}</span>
+                <li key={r.id} role="option" aria-selected={i === hi} className={i === hi ? 'hi' : ''} onMouseDown={(e) => { e.preventDefault(); pick(r); }} onMouseEnter={() => setHi(i)}>
+                  <span className="t">{r.t}</span>
+                  <span className="m">{[r.f.replace('_', ' '), r.y].filter(Boolean).join(' · ')}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
-        <button disabled={!enabled || !current || locked} onClick={onLock}>{locked ? 'Locked ✓' : 'Lock in'}</button>
+        <button className={locked ? 'btn good' : 'btn primary'} disabled={!enabled || !current || locked} onClick={onLock}>
+          {locked ? <><Icon name="check" /> Locked</> : <><Icon name="lock" size={17} /> Lock in</>}
+        </button>
       </div>
-      <div className="muted small">
-        {current ? <>Your answer: <b>{current.title}</b>{locked ? ' (locked)' : ' · press Enter or “Lock in” to confirm'}</> : enabled ? 'Pick a title from the list. Any season of the right series counts.' : ' '}
+      <div className="guess-hint">
+        {current ? (
+          locked ? <>Locked in: <b>{current.title}</b></> : <>Your answer: <b>{current.title}</b> <span className="faint">· <span className="kbd">Enter</span> or Lock in to confirm</span></>
+        ) : enabled ? 'Pick a title from the list. You can change it until you lock in.' : '\u00a0'}
       </div>
     </div>
   );

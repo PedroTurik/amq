@@ -7,10 +7,10 @@ Rounds pick random openings filtered by **difficulty** (mainly how popular the a
 ## Status (2026-09-25)
 - **Phase 1 is done: data research and dataset.** `openings.json` is a ready-to-use static dataset.
   Full evidence and reasoning are in `DATA_FINDINGS.md`. Read it before changing the data approach.
-- **Phase 2 is done: the app** (a working MVP; the UI is intentionally plain). See `README.md` for how to run, deploy,
+- **Phase 2 is done: the app** (tested with real players). See `README.md` for how to run, deploy,
   the game rules and a code map. `npm test` runs the unit tests and the socket end-to-end tests.
-- **Next: visual design** of the frontend. **Designer agents: start with `DESIGN_HANDOFF.md`** (screens, states,
-  constraints, how to reach every screen). Game logic lives only on the server. The user tested the app with real players and confirmed it works.
+- **Phase 3 is done: visual design.** Brand **"Petit Quiz"**, a dark "night stage" theme (magenta accent, cyan for focus),
+  English UI, tasteful motion. `DESIGN_HANDOFF.md` has the design system and the screens. Game logic lives only on the server.
 
 ## Decisions made with the user
 - Stack: Node + TypeScript, Express + Socket.IO, SQLite (better-sqlite3), React + Vite. Hosted on a VPS

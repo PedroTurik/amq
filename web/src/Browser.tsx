@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { RoomListItem } from '../../shared/types';
 import { media } from './media';
 import { playerToken, request, saveName, savedName } from './net';
+import { Icon, Logo } from './ui';
 
 /** Home screen: list of rooms + create a room. */
 export function Browser({ onEnter, setNotice }: { onEnter: (roomId: string) => void; setNotice: (s: string) => void }) {
@@ -41,42 +42,80 @@ export function Browser({ onEnter, setNotice }: { onEnter: (roomId: string) => v
   };
 
   return (
-    <div className="browser">
-      <h1>Anime Opening Quiz</h1>
+    <div className="home">
+      <header className="home-top">
+        <Logo />
+        <span className="grow" />
+        <button className="btn ghost sm" onClick={() => fetch('/api/logout', { method: 'POST' }).then(() => location.reload())}>
+          <Icon name="logout" size={16} /> Log out
+        </button>
+      </header>
 
-      <section>
-        <h3>Rooms</h3>
-        {!rooms && <p className="muted">Loading…</p>}
-        {rooms?.length === 0 && <p className="muted">No rooms yet: create one below.</p>}
-        <ul className="room-list">
-          {rooms?.map((r) => (
-            <li key={r.id}>
-              <button onClick={() => enter(r.id)}>Join</button>
-              <b>{r.name}</b> <span className="muted">#{r.id}</span>
-              <span className="muted"> · {r.online} online / {r.players} players{r.inGame ? ' · in game' : ''}</span>
-            </li>
-          ))}
-        </ul>
-        <form className="row" onSubmit={(e) => { e.preventDefault(); if (code.trim()) enter(code.trim().toUpperCase()); }}>
-          <input placeholder="Room code" value={code} onChange={(e) => setCode(e.target.value)} maxLength={12} />
-          <button className="secondary">Go</button>
-        </form>
-      </section>
+      <div className="home-hero">
+        <h1>Hear the opening.<br /><em>Name the anime.</em></h1>
+        <p>Join your friends' room, or open a new one.</p>
+      </div>
 
-      <section>
-        <h3>Create a room</h3>
-        <form className="stack" onSubmit={create}>
-          <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={20} required />
-          <input placeholder="Room name" value={roomName} onChange={(e) => setRoomName(e.target.value)} maxLength={30} required />
-          <input placeholder="Room password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} maxLength={64} required />
-          <button disabled={busy}>Create room</button>
-          <div className="error">{err}</div>
-        </form>
-      </section>
+      <div className="home-grid">
+        <section className="card">
+          <div className="card-head">
+            <h3>Rooms</h3>
+            {rooms && rooms.length > 0 && <span className="pill">{rooms.length}</span>}
+          </div>
+          {!rooms && <div className="empty"><span className="spinner" /></div>}
+          {rooms?.length === 0 && (
+            <div className="empty">
+              <Icon name="music" size={28} />
+              <b>No rooms yet</b>
+              <span className="small">Create one and send the link to your friends.</span>
+            </div>
+          )}
+          {!!rooms?.length && (
+            <ul className="room-list">
+              {rooms.map((r) => (
+                <li key={r.id}>
+                  <button className="room-item" onClick={() => enter(r.id)}>
+                    <span className={r.inGame ? 'room-icon live' : 'room-icon'}><Icon name={r.inGame ? 'music' : 'users'} size={20} /></span>
+                    <span className="meta">
+                      <span className="name">{r.name}</span>
+                      <span className="sub">
+                        <span className="code">{r.id}</span>
+                        <span><span className={r.online ? 'dot on' : 'dot'} /> {r.online} online</span>
+                        {r.inGame && <span className="pill live"><span className="dot live" /> Playing</span>}
+                      </span>
+                    </span>
+                    <Icon name="chevron" className="chev" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <form className="code-row" onSubmit={(e) => { e.preventDefault(); if (code.trim()) enter(code.trim().toUpperCase()); }}>
+            <input placeholder="Have a room code?" aria-label="Room code" value={code} onChange={(e) => setCode(e.target.value)} maxLength={12} autoCapitalize="characters" autoComplete="off" />
+            <button className="btn outline" disabled={!code.trim()}>Join</button>
+          </form>
+        </section>
 
-      <p className="muted small">
-        <a href="#" onClick={(e) => { e.preventDefault(); fetch('/api/logout', { method: 'POST' }).then(() => location.reload()); }}>Log out of the site</a>
-      </p>
+        <section className="card">
+          <div className="card-head"><h3>New room</h3></div>
+          <form className="create-form" onSubmit={create}>
+            <label className="field">
+              <span>Your name</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} maxLength={20} required autoComplete="nickname" />
+            </label>
+            <label className="field">
+              <span>Room name</span>
+              <input placeholder="Friday night OPs" value={roomName} onChange={(e) => setRoomName(e.target.value)} maxLength={30} required />
+            </label>
+            <label className="field">
+              <span>Room password</span>
+              <input type="password" placeholder="Friends need it to join" value={password} onChange={(e) => setPassword(e.target.value)} maxLength={64} required autoComplete="new-password" />
+            </label>
+            <button className="btn primary lg block" disabled={busy}><Icon name="plus" /> {busy ? 'Creating…' : 'Create room'}</button>
+            <div className="error" role="alert">{err}</div>
+          </form>
+        </section>
+      </div>
     </div>
   );
 }

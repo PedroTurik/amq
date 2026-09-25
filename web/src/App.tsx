@@ -4,6 +4,7 @@ import { Browser } from './Browser';
 import { media } from './media';
 import { playerToken, request, saveName, savedName, socket, syncClock } from './net';
 import { RoomScreen } from './Room';
+import { Icon, Logo, Toast } from './ui';
 
 // ---------------------------------------------------------------- tiny router
 
@@ -47,13 +48,22 @@ function Login() {
     if (j.ok) location.reload();
     else setErr(j.error ?? 'Wrong password');
   };
+  // Keep in sync with server/login.html (served instead of this in production).
   return (
-    <form className="center-card" onSubmit={submit}>
-      <h2>Anime Quiz</h2>
-      <input type="password" placeholder="Site password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus />
-      <button>Enter</button>
-      <div className="error">{err}</div>
-    </form>
+    <div className="auth">
+      <div className="auth-box">
+        <Logo large />
+        <p className="tagline">Guess the anime from its opening.</p>
+        <form className="card auth-card" onSubmit={submit}>
+          <label className="field">
+            <span>Site password</span>
+            <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" autoFocus required />
+          </label>
+          <button className="btn primary lg block">Enter</button>
+          <div className="error" role="alert">{err}</div>
+        </form>
+      </div>
+    </div>
   );
 }
 
@@ -149,13 +159,17 @@ function Main() {
 
   return (
     <>
-      {!connected && <div className="banner warn">Connecting to the server…</div>}
-      {notice && <div className="banner" onClick={() => setNotice('')}>{notice} <small>(click to dismiss)</small></div>}
+      <div className="toasts">
+        {!connected && <Toast tone="warn">Connecting to the server…</Toast>}
+        {notice && <Toast tone="bad" onClose={() => setNotice('')}>{notice}</Toast>}
+      </div>
       {replaced && (
         <div className="overlay">
-          <div className="center-card">
-            <p>This room is open in another tab or device.</p>
-            <button onClick={() => { setReplaced(false); if (roomId) join(roomId); media.unlock(); }}>Play here instead</button>
+          <div className="card modal">
+            <Icon name="users" size={32} className="muted" />
+            <h2>Open somewhere else</h2>
+            <p className="muted">This room is open in another tab or device.</p>
+            <button className="btn primary lg block" onClick={() => { setReplaced(false); if (roomId) join(roomId); media.unlock(); }}>Play here instead</button>
           </div>
         </div>
       )}
@@ -164,7 +178,9 @@ function Main() {
         <JoinForm roomId={roomId} onJoined={() => setJoinState('joined')} onCancel={() => navigate('/')} />
       )}
       {roomId && view && joinState === 'joined' && <RoomScreen view={view} onLeave={leave} />}
-      {roomId && !view && joinState !== 'needPassword' && <p className="muted pad">Joining room {roomId}…</p>}
+      {roomId && !view && joinState !== 'needPassword' && (
+        <div className="center-screen"><span className="spinner" />Joining room {roomId}…</div>
+      )}
     </>
   );
 }
@@ -185,13 +201,24 @@ function JoinForm({ roomId, onJoined, onCancel }: { roomId: string; onJoined: ()
     onJoined();
   };
   return (
-    <form className="center-card" onSubmit={submit}>
-      <h2>Join room {roomId}</h2>
-      <input placeholder="Your name" value={name} maxLength={20} onChange={(e) => setName(e.target.value)} required autoFocus={!name} />
-      <input type="password" placeholder="Room password" value={password} onChange={(e) => setPassword(e.target.value)} required autoFocus={!!name} />
-      <button disabled={busy}>Join</button>
-      <button type="button" className="secondary" onClick={onCancel}>Back</button>
-      <div className="error">{err}</div>
-    </form>
+    <div className="auth">
+      <div className="auth-box">
+        <Logo large />
+        <form className="card auth-card" onSubmit={submit}>
+          <h2>Join room <span className="code">{roomId}</span></h2>
+          <label className="field">
+            <span>Your name</span>
+            <input value={name} maxLength={20} onChange={(e) => setName(e.target.value)} required autoFocus={!name} autoComplete="nickname" />
+          </label>
+          <label className="field">
+            <span>Room password</span>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoFocus={!!name} />
+          </label>
+          <button className="btn primary lg block" disabled={busy}>{busy ? 'Joining…' : 'Join'}</button>
+          <button type="button" className="btn ghost block" onClick={onCancel}>Back to rooms</button>
+          <div className="error" role="alert">{err}</div>
+        </form>
+      </div>
+    </div>
   );
 }

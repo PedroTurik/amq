@@ -75,6 +75,25 @@ Good places to add polish (none of these need server changes):
 - No UI library or CSS framework is installed. Choose one if you want (keep the bundle reasonable for phones), or
   stay with plain CSS. Fonts must be self-hosted or from a CDN.
 
+## Current design (2026-09-25): "Petit Quiz", night stage
+Chosen with the user: a dark stage, one hot accent, English copy, tasteful motion (no confetti).
+- **Tokens** are at the top of `web/src/styles.css` (`--bg`, `--surface*`, `--accent` magenta `#e3206f`, `--pink`, `--cyan`
+  for focus/secondary, `--good`/`--bad`/`--warn`, radii). Plain CSS, no framework. Motion respects `prefers-reduced-motion`.
+- **Font:** Outfit Variable, self-hosted through `@fontsource-variable/outfit` (32 KB woff2, latin). `server/login.html` can't
+  reach bundled assets before auth, so it loads Outfit from Google Fonts and copies the tokens inline. **Keep it in sync with
+  `Login` in `App.tsx`.**
+- **Primitives** are in `web/src/ui.tsx`: `Logo`/`LogoMark` (equalizer-bar mark, same motif as the in-game equalizer), `Icon` (inline
+  stroke SVGs), `Avatar` (initial plus a stable hue per name), `useCopy`, `Toast`. Favicon: inline SVG data URI in `index.html` and `login.html`.
+- **Screens:** the home page has a room list plus a create form, and a join-by-code row. The lobby is start card (pool size, Start, invite
+  hint when alone), then settings (steppers, toggle chips, segmented control, switches), then ranking. Guessing shows an equalizer
+  (`media.status.audioState === 'playing'`), a big countdown that turns red and ticks in the last 5 s, and faces showing who locked in. Reveal
+  has the verdict pill with Next/votes in the same row, the video, and answer details, with results sorted correct first and the fastest correct
+  marked with ⚡. Finished shows a podium (2nd, 1st, 3rd), a card grid of the songs, and the ranking.
+- **Phones (<900px / <600px):** one column, players card after the game area (in the lobby it sits between the start card and the settings,
+  using `display: contents`). The logo is hidden in the room top bar, and the autocomplete list spans the input and the Lock button. Inputs are 16px+ so iOS doesn't zoom.
+- During a game the players list is sorted by points (display only). The lobby preloads the autocomplete index.
+- Not covered by QA yet: Safari/iOS on a real device, 20+ players, very long titles in the podium.
+
 ## Checklist before you hand back
 - [ ] `npm run typecheck` and `npm test` pass. `npm run build` succeeds.
 - [ ] Played a full game solo **and** with a second window, on desktop width and on a phone-sized viewport (~375px).

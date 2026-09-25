@@ -1,0 +1,28 @@
+# Usage on the VPS:  DOMAIN=quiz.example.com docker compose up -d --build
+# Caddy gets a Let's Encrypt certificate automatically (point the domain's DNS at the VPS first).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      MASTER_PASSWORD: ${MASTER_PASSWORD:-Guigayafuu}
+    volumes:
+      - quizdata:/data
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN, e.g. DOMAIN=quiz.example.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+    depends_on:
+      - app
+
+volumes:
+  quizdata:
+  caddydata:

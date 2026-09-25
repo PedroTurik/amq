@@ -1,0 +1,7 @@
+node_modules
+dist
+data
+.git
+anisongdb_openings_raw.json
+anime_ids.json
+*.log

@@ -7,15 +7,25 @@ Rounds pick random openings filtered by **difficulty** (mainly how popular the a
 ## Status (2026-09-25)
 - **Phase 1 is done: data research and dataset.** `openings.json` is a ready-to-use static dataset.
   Full evidence and reasoning are in `DATA_FINDINGS.md`. Read it before changing the data approach.
-- **Phase 2 has not started: the app.** No app code, framework, or repo exists yet (the folder is not a git repo).
+- **Phase 2 is done: the app** (a working MVP; the UI is intentionally plain). See `README.md` for how to run, deploy,
+  the game rules and a code map. `npm test` runs the unit tests and the socket end-to-end tests.
+- **Next: visual design** of the frontend (`web/src/`, `styles.css`). Game logic lives only on the server.
 
-## Open decisions for the user
-Ask about these before building. None of them are decided:
-1. Tech stack and hosting. The user hasn't expressed a preference.
-2. Multiplayer model: one shared screen (party mode) or everyone on their own device (needs a realtime backend).
-3. Answer input: free text with autocomplete, or multiple choice.
-4. Media: video, audio only, or both as modes. Clip length and start point (random offset or start of the song).
-5. How difficulty is chosen (fixed tiers vs. sliders) and the tier thresholds (defaults below).
+## Decisions made with the user
+- Stack: Node + TypeScript, Express + Socket.IO, SQLite (better-sqlite3), React + Vite. Hosted on a VPS
+  (Docker Compose + Caddy for HTTPS). The code supports Node >=18.18 because this machine has Node 18.
+- Access: one site-wide master password (`Guigayafuu`, env `MASTER_PASSWORD`). No accounts, only temporary names.
+  Rooms have their own password, and the creator is admin.
+- Everyone plays on their own device. **Audio only while guessing.** At the reveal, the video continues from the
+  point where the audio stopped.
+- Answers: free text with autocomplete. **Any entry of the same franchise is correct.**
+- A disconnected player is excluded from the current round and keeps their points on rejoin.
+
+## Invariants worth keeping
+- The server is authoritative: clients get per-player snapshots (`Room.view`) and never see the answer before the reveal.
+- All phase deadlines are server-clock timestamps, and clients sync their clocks (`web/src/net.ts`). `media.ts` reconciles
+  playback against them every 200 ms, so don't add client-side timers that drive the game.
+- `Room` never touches sockets directly; it talks through the `Hub` interface, which keeps it unit-testable with fake timers.
 
 ## Files
 | File | What it is |
@@ -26,6 +36,7 @@ Ask about these before building. None of them are decided:
 | `anisongdb_openings_raw.json` | Raw crawl of **all** 8,873 AnisongDB openings (all anime, raw AnisongDB schema). |
 | `anime_ids.json` | User-provided id map, keyed by **AniDB id** → `{mal_id, anilist_id, tvdb_id, ...}` (17k entries, 1.7 MB; query it programmatically). The builder uses it as a join fallback. |
 | `DATA_FINDINGS.md` | Research report: sources compared, coverage numbers, rejected options. |
+| `README.md` | App: run/deploy instructions, game rules, code map. |
 
 ## `openings.json` schema (array of objects, one per opening)
 | Field | Type | Notes |
@@ -70,7 +81,7 @@ Ask about these before building. None of them are decided:
 - Missing on purpose: shows without openings, Chinese donghua (AMQ excludes them), and some 2025+ seasons AMQ
   hasn't added. Re-running the builder picks up new data.
 
-## Media playback facts (verified with curl/ffprobe, not yet in a real browser)
+## Media playback facts (verified with curl/ffprobe, and in headless Chrome with the app)
 - Hosts: `naedist.animemusicquiz.com` (used in the dataset, fastest from the user's location, which is probably
   Brazil: ~2 MB/s, ~1.1s TTFB), `eudist.` (similar), `nawdist.` (slower). Same file names on every mirror.
   `files.catbox.moe` returns empty bodies, so don't use it.

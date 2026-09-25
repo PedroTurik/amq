@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anime Quiz</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #111; color: #eee; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+  form { display: grid; gap: 10px; width: min(320px, 90vw); }
+  input, button { font: inherit; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: inherit; }
+  button { background: #3b6fd8; border: 0; cursor: pointer; }
+  #err { color: #f77; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<form id="f">
+  <h2>Anime Quiz</h2>
+  <input id="pw" type="password" placeholder="Site password" autocomplete="current-password" autofocus required>
+  <button>Enter</button>
+  <div id="err"></div>
+</form>
+<script>
+  document.getElementById('f').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('err');
+    err.textContent = '';
+    try {
+      const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: document.getElementById('pw').value }) });
+      const j = await r.json();
+      if (j.ok) location.reload(); else err.textContent = j.error || 'Wrong password';
+    } catch { err.textContent = 'Could not reach the server'; }
+  });
+</script>
+</body>
+</html>

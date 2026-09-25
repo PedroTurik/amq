@@ -1,0 +1,12 @@
+# Render Blueprint: New > Blueprint > pick this repo. Builds the Dockerfile on the free plan.
+# Free instances sleep after ~15 min idle and have no persistent disk, so rooms and rankings reset on restart.
+services:
+  - type: web
+    name: petit-quiz
+    runtime: docker
+    plan: free
+    region: virginia  # closest Render region to Brazil
+    healthCheckPath: /healthz
+    envVars:
+      - key: MASTER_PASSWORD
+        sync: false  # Render asks for the value when the Blueprint is created

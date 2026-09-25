@@ -35,6 +35,11 @@ This runs the app plus Caddy, which terminates HTTPS with an automatic Let's Enc
 WebSockets. Point the domain's DNS at the VPS first, and open ports 80 and 443. Data lives in the `quizdata`
 volume. It's a single Node process with SQLite, and a 1 vCPU / 512 MB box is plenty.
 
+### Free alternative: Render
+`render.yaml` is a Render Blueprint (Dashboard → New → Blueprint → this repo). The free plan sleeps after ~15 min
+without visitors (the first request then takes ~1 min) and has no persistent disk, so rooms and rankings reset
+whenever the instance restarts or redeploys.
+
 Without Docker, run `npm ci && npm run build && npm start` behind any reverse proxy that forwards WebSockets
 (nginx needs `proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade";`).
 
